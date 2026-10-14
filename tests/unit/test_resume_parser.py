@@ -143,6 +143,20 @@ class TestResumeParser:
         assert any("education" in s for s in sections_lower)
         assert any("skills" in s for s in sections_lower)
 
+    @pytest.mark.parametrize("indent", ["    ", "\t"])
+    def test_detect_sections_matches_unindented_text(self, parser, indent):
+        """Horizontal indentation preserves the detected section names."""
+        text = (
+            "Experience:\nSenior Developer at TechCorp\n\n"
+            "Education:\nBS Computer Science\n\n"
+            "Skills: Python, JavaScript\n"
+        )
+        indented = "\n".join(indent + line for line in text.splitlines())
+
+        expected = {"Experience", "Education", "Skills"}
+        assert set(parser._detect_sections(text)) == expected
+        assert set(parser._detect_sections(indented)) == expected
+
     def test_strip_markdown_syntax(self, parser):
         """Test markdown syntax stripping."""
         markdown_text = """
